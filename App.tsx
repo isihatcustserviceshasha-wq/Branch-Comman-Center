@@ -339,7 +339,20 @@ function AppContent() {
     setLoginError(null);
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      // Create user document if it doesn't exist
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          displayName: user.displayName,
+          role: user.email === 'isihatcustserviceshasha@gmail.com' ? 'admin' : 'user',
+          createdAt: serverTimestamp()
+        });
+      }
     } catch (error: any) {
       console.error("Login failed:", error);
       if (error.code === 'auth/popup-blocked') {
