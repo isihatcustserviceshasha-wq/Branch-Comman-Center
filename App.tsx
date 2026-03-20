@@ -491,16 +491,19 @@ function AppContent() {
                 <Bell className="w-5 h-5 shrink-0 mt-0.5" />
                 <p>{loginError}</p>
               </div>
-              {loginError.includes('unauthorized-domain') && (
+              {(loginError.includes('unauthorized') || loginError.includes('domain')) && (
                 <div className="mt-2 p-3 bg-white/50 rounded-xl border border-rose-200 text-xs text-rose-800">
-                  <p className="font-bold mb-1">How to fix:</p>
-                  <ol className="list-decimal ml-4 space-y-1">
-                    <li>Go to <a href="https://console.firebase.google.com/project/gen-lang-client-0853988511/authentication/settings" target="_blank" className="underline font-bold">Firebase Console</a></li>
-                    <li>Go to <strong>Settings</strong> &gt; <strong>Authorized domains</strong></li>
-                    <li>Add these two domains:
-                      <code className="block mt-1 p-1 bg-rose-100 rounded select-all">ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
-                      <code className="block mt-1 p-1 bg-rose-100 rounded select-all">ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                  <p className="font-bold mb-1 text-rose-900">How to fix this permanently:</p>
+                  <ol className="list-decimal ml-4 space-y-2">
+                    <li>Open the <a href="https://console.firebase.google.com/project/gen-lang-client-0853988511/authentication/settings" target="_blank" className="underline font-bold text-indigo-600">Firebase Auth Settings</a></li>
+                    <li>Click <strong>"Authorized domains"</strong> tab</li>
+                    <li>Click <strong>"Add domain"</strong> and paste this:
+                      <code className="block mt-1 p-2 bg-rose-100 rounded select-all font-mono text-[10px] break-all">ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
                     </li>
+                    <li>Click <strong>"Add domain"</strong> again and paste this:
+                      <code className="block mt-1 p-2 bg-rose-100 rounded select-all font-mono text-[10px] break-all">ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                    </li>
+                    <li>Wait 30 seconds and try signing in again.</li>
                   </ol>
                 </div>
               )}
