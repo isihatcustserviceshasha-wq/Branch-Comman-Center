@@ -36,7 +36,8 @@ import {
   updateDoc,
   increment,
   getDoc,
-  setDoc
+  setDoc,
+  getDocFromServer
 } from 'firebase/firestore';
 import { 
   signInWithPopup, 
@@ -244,6 +245,8 @@ function AppContent() {
   const [branchStatus, setBranchStatus] = useState<{ [key: string]: number }>({});
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Link management: { [toolId: string]: SavedLink[] }
   const [links, setLinks] = useState<{ [key: string]: SavedLink[] }>(() => {
@@ -270,6 +273,19 @@ function AppContent() {
 
   // Initialize Auth and Listeners
   useEffect(() => {
+    // Connection test
+    const testConnection = async () => {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('the client is offline')) {
+          console.error("Please check your Firebase configuration.");
+          setLoginError("Database connection failed. Please check your Firebase configuration.");
+        }
+      }
+    };
+    testConnection();
+
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setIsAuthReady(true);
@@ -319,11 +335,22 @@ function AppContent() {
   }, [isAuthReady, currentUser]);
 
   const handleLogin = async () => {
+    setIsLoggingIn(true);
+    setLoginError(null);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
+      if (error.code === 'auth/popup-blocked') {
+        setLoginError("Sign-in popup was blocked by your browser. Please allow popups for this site.");
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        // Ignore user cancellation
+      } else {
+        setLoginError(error.message || "Login failed. Please try again.");
+      }
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -442,13 +469,32 @@ function AppContent() {
           </div>
           <h2 className="text-3xl font-bold text-slate-900 mb-2">Command Center</h2>
           <p className="text-slate-500 mb-10">Please sign in with your admin account to access the dashboard.</p>
+          
+          {loginError && (
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-sm flex items-start gap-3 text-left">
+              <Bell className="w-5 h-5 shrink-0 mt-0.5" />
+              <p>{loginError}</p>
+            </div>
+          )}
+
           <button 
             onClick={handleLogin}
-            className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 flex items-center justify-center gap-3"
+            disabled={isLoggingIn}
+            className={`w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 flex items-center justify-center gap-3 ${isLoggingIn ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <Globe className="w-6 h-6" />
-            Sign in with Google
+            {isLoggingIn ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+            ) : (
+              <>
+                <Globe className="w-6 h-6" />
+                Sign in with Google
+              </>
+            )}
           </button>
+          
+          <p className="mt-6 text-xs text-slate-400">
+            If nothing happens, please check if your browser is blocking popups.
+          </p>
         </div>
       </div>
     );
