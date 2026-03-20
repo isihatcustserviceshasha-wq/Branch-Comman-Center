@@ -1,0 +1,5 @@
+{
+  "name": "Branch Command Center",
+  "description": "A centralized dashboard to manage multiple business accounts across Setapak, Sentul, Bukit Jalil, and Petaling Jaya branches.",
+  "requestFramePermissions": []
+}

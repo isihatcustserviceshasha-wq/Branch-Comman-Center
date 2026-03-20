@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "notification": {
+      "title": "Notification",
+      "description": "A WhatsApp message notification from a branch.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "branch": { "type": "string" },
+        "message": { "type": "string" },
+        "time": { "type": "string" },
+        "isNew": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["unread", "new"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["branch", "message", "time", "isNew", "type", "createdAt"]
+    },
+    "branch": {
+      "title": "Branch",
+      "description": "A physical branch location.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "whatsappUrl": { "type": "string" },
+        "unreadCount": { "type": "integer" }
+      },
+      "required": ["name", "whatsappUrl", "unreadCount"]
+    }
+  },
+  "firestore": {
+    "/notifications/{notificationId}": {
+      "schema": "notification",
+      "description": "Collection of all WhatsApp notifications."
+    },
+    "/branches/{branchId}": {
+      "schema": "branch",
+      "description": "Configuration and status for each branch."
+    }
+  }
+}
