@@ -357,6 +357,8 @@ function AppContent() {
       console.error("Login failed:", error);
       if (error.code === 'auth/popup-blocked') {
         setLoginError("Sign-in popup was blocked by your browser. Please allow popups for this site.");
+      } else if (error.code === 'auth/unauthorized-domain') {
+        setLoginError("This domain is not authorized for login. Please add the current URL to your Firebase Console's Authorized Domains.");
       } else if (error.code === 'auth/cancelled-popup-request') {
         // Ignore user cancellation
       } else {
@@ -484,9 +486,24 @@ function AppContent() {
           <p className="text-slate-500 mb-10">Please sign in with your admin account to access the dashboard.</p>
           
           {loginError && (
-            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-sm flex items-start gap-3 text-left">
-              <Bell className="w-5 h-5 shrink-0 mt-0.5" />
-              <p>{loginError}</p>
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-sm flex flex-col gap-3 text-left">
+              <div className="flex items-start gap-3">
+                <Bell className="w-5 h-5 shrink-0 mt-0.5" />
+                <p>{loginError}</p>
+              </div>
+              {loginError.includes('unauthorized-domain') && (
+                <div className="mt-2 p-3 bg-white/50 rounded-xl border border-rose-200 text-xs text-rose-800">
+                  <p className="font-bold mb-1">How to fix:</p>
+                  <ol className="list-decimal ml-4 space-y-1">
+                    <li>Go to <a href="https://console.firebase.google.com/project/gen-lang-client-0853988511/authentication/settings" target="_blank" className="underline font-bold">Firebase Console</a></li>
+                    <li>Go to <strong>Settings</strong> &gt; <strong>Authorized domains</strong></li>
+                    <li>Add these two domains:
+                      <code className="block mt-1 p-1 bg-rose-100 rounded select-all">ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                      <code className="block mt-1 p-1 bg-rose-100 rounded select-all">ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                    </li>
+                  </ol>
+                </div>
+              )}
             </div>
           )}
 
