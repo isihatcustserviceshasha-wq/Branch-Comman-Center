@@ -2,7 +2,7 @@
   "entities": {
     "notification": {
       "title": "Notification",
-      "description": "A WhatsApp message notification from a branch.",
+      "description": "A message or comment notification from WhatsApp, TikTok, or Instagram.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -11,9 +11,11 @@
         "time": { "type": "string" },
         "isNew": { "type": "boolean" },
         "type": { "type": "string", "enum": ["unread", "new"] },
+        "source": { "type": "string", "enum": ["whatsapp", "tiktok", "instagram"] },
+        "category": { "type": "string", "enum": ["message", "comment", "notification"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["branch", "message", "time", "isNew", "type", "createdAt"]
+      "required": ["branch", "message", "time", "isNew", "type", "source", "category", "createdAt"]
     },
     "branch": {
       "title": "Branch",
@@ -23,9 +25,33 @@
         "id": { "type": "string" },
         "name": { "type": "string" },
         "whatsappUrl": { "type": "string" },
-        "unreadCount": { "type": "integer" }
+        "whatsappUnreadCount": { "type": "integer" },
+        "tiktokUnreadCount": { "type": "integer" },
+        "instagramUnreadCount": { "type": "integer" }
       },
-      "required": ["name", "whatsappUrl", "unreadCount"]
+      "required": ["name", "whatsappUrl", "whatsappUnreadCount", "tiktokUnreadCount", "instagramUnreadCount"]
+    },
+    "user": {
+      "title": "User",
+      "description": "A user of the application.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "role", "createdAt"]
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Global application settings and links.",
+      "type": "object",
+      "properties": {
+        "links": { "type": "object" },
+        "branchToolUrls": { "type": "object" },
+        "connectedTools": { "type": "object" }
+      }
     }
   },
   "firestore": {
@@ -36,6 +62,14 @@
     "/branches/{branchId}": {
       "schema": "branch",
       "description": "Configuration and status for each branch."
+    },
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profiles and roles."
+    },
+    "/settings/{settingsId}": {
+      "schema": "settings",
+      "description": "Global settings for the application."
     }
   }
 }

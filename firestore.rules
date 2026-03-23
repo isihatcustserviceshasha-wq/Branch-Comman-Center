@@ -23,13 +23,23 @@ service cloud.firestore {
              data.type in ['unread', 'new'] &&
              data.isNew is bool &&
              data.time is string && data.time.size() < 50 &&
+             data.source in ['whatsapp', 'tiktok', 'instagram'] &&
+             data.category in ['message', 'comment', 'notification'] &&
              data.createdAt is timestamp;
     }
 
     function isValidBranch(data) {
       return data.name is string && data.name.size() < 100 &&
              data.whatsappUrl is string && data.whatsappUrl.size() < 500 &&
-             data.unreadCount is int && data.unreadCount >= 0;
+             (!('whatsappUnreadCount' in data) || (data.whatsappUnreadCount is int && data.whatsappUnreadCount >= 0)) &&
+             (!('tiktokUnreadCount' in data) || (data.tiktokUnreadCount is int && data.tiktokUnreadCount >= 0)) &&
+             (!('instagramUnreadCount' in data) || (data.instagramUnreadCount is int && data.instagramUnreadCount >= 0));
+    }
+
+    function isValidUser(data) {
+      return data.email is string && data.email.size() < 200 &&
+             data.role in ['admin', 'user'] &&
+             (data.displayName == null || (data.displayName is string && data.displayName.size() < 200));
     }
 
     // Notifications: Admins can read/write
@@ -54,6 +64,14 @@ service cloud.firestore {
     // Users: Users can read their own data, admins can do anything
     match /users/{userId} {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && (request.auth.uid == userId || isAdmin()) && isValidUser(request.resource.data);
+      allow update: if isAdmin() && isValidUser(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Settings: Admins can read/write
+    match /settings/{settingsId} {
+      allow read: if isAdmin();
       allow write: if isAdmin();
     }
   }
