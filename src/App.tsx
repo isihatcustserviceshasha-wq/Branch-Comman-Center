@@ -358,7 +358,12 @@ function AppContent() {
       if (error.code === 'auth/popup-blocked') {
         setLoginError("Sign-in popup was blocked by your browser. Please allow popups for this site.");
       } else if (error.code === 'auth/unauthorized-domain') {
-        setLoginError("This domain is not authorized for login. Please add the current URL to your Firebase Console's Authorized Domains.");
+        setLoginError("This domain is not authorized. Attempting fallback login method...");
+        try {
+          await signInWithRedirect(auth, provider);
+        } catch (redirectError: any) {
+          setLoginError("Login failed. Please add the current URL to your Firebase Console's Authorized Domains.");
+        }
       } else if (error.code === 'auth/cancelled-popup-request') {
         // Ignore user cancellation
       } else {
@@ -494,16 +499,33 @@ function AppContent() {
               {(loginError.includes('unauthorized') || loginError.includes('domain')) && (
                 <div className="mt-2 p-3 bg-white/50 rounded-xl border border-rose-200 text-xs text-rose-800">
                   <p className="font-bold mb-1 text-rose-900">How to fix this permanently:</p>
-                  <ol className="list-decimal ml-4 space-y-2">
+                  <p className="mb-2 opacity-80 italic">Your current hostname is: <span className="font-mono font-bold">{window.location.hostname}</span></p>
+                  <ol className="list-decimal ml-4 space-y-3">
                     <li>Open the <a href="https://console.firebase.google.com/project/gen-lang-client-0853988511/authentication/settings" target="_blank" className="underline font-bold text-indigo-600">Firebase Auth Settings</a></li>
                     <li>Click <strong>"Authorized domains"</strong> tab</li>
-                    <li>Click <strong>"Add domain"</strong> and paste this:
-                      <code className="block mt-1 p-2 bg-rose-100 rounded select-all font-mono text-[10px] break-all">ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                    <li>Click <strong>"Add domain"</strong> and paste this exact text:
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="flex-1 p-2 bg-rose-100 rounded font-mono text-[10px] break-all">ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                        <button 
+                          onClick={() => navigator.clipboard.writeText('ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app')}
+                          className="px-2 py-1 bg-rose-200 hover:bg-rose-300 rounded text-[10px] font-bold transition-colors"
+                        >
+                          Copy
+                        </button>
+                      </div>
                     </li>
                     <li>Click <strong>"Add domain"</strong> again and paste this:
-                      <code className="block mt-1 p-2 bg-rose-100 rounded select-all font-mono text-[10px] break-all">ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="flex-1 p-2 bg-rose-100 rounded font-mono text-[10px] break-all">ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                        <button 
+                          onClick={() => navigator.clipboard.writeText('ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app')}
+                          className="px-2 py-1 bg-rose-200 hover:bg-rose-300 rounded text-[10px] font-bold transition-colors"
+                        >
+                          Copy
+                        </button>
+                      </div>
                     </li>
-                    <li>Wait 30 seconds and try signing in again.</li>
+                    <li><strong>Important:</strong> Wait 1-2 minutes for Firebase to update, then <strong>refresh this page</strong> (Ctrl+F5) and try again.</li>
                   </ol>
                 </div>
               )}
