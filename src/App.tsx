@@ -496,36 +496,55 @@ function AppContent() {
                 <Bell className="w-5 h-5 shrink-0 mt-0.5" />
                 <p>{loginError}</p>
               </div>
-              {(loginError.includes('unauthorized') || loginError.includes('domain')) && (
-                <div className="mt-2 p-3 bg-white/50 rounded-xl border border-rose-200 text-xs text-rose-800">
-                  <p className="font-bold mb-1 text-rose-900">How to fix this permanently:</p>
-                  <p className="mb-2 opacity-80 italic">Your current hostname is: <span className="font-mono font-bold">{window.location.hostname}</span></p>
-                  <ol className="list-decimal ml-4 space-y-3">
-                    <li>Open the <a href="https://console.firebase.google.com/project/gen-lang-client-0853988511/authentication/settings" target="_blank" className="underline font-bold text-indigo-600">Firebase Auth Settings</a></li>
-                    <li>Click <strong>"Authorized domains"</strong> tab</li>
-                    <li>Click <strong>"Add domain"</strong> and paste this exact text:
-                      <div className="flex items-center gap-2 mt-1">
-                        <code className="flex-1 p-2 bg-rose-100 rounded font-mono text-[10px] break-all">ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+              {(loginError.toLowerCase().includes('unauthorized') || loginError.toLowerCase().includes('domain')) && (
+                <div className="mt-4 p-4 bg-indigo-50 border border-indigo-100 rounded-2xl text-sm text-indigo-900 shadow-sm">
+                  <p className="font-bold mb-2 flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-indigo-600" />
+                    Action Required: Authorize this Domain
+                  </p>
+                  <p className="mb-3 opacity-90 leading-relaxed">
+                    Firebase requires you to manually authorize the preview domains. Please follow these steps:
+                  </p>
+                  <ol className="list-decimal ml-5 space-y-3">
+                    <li>
+                      Open the <a href="https://console.firebase.google.com/project/gen-lang-client-0853988511/authentication/settings" target="_blank" className="underline font-bold text-indigo-600 hover:text-indigo-800">Firebase Auth Settings</a>
+                    </li>
+                    <li>
+                      Click the <strong>"Authorized domains"</strong> tab (you may need to scroll down in the left settings column).
+                    </li>
+                    <li>
+                      Click <strong>"Add domain"</strong> and paste this:
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <code className="flex-1 p-2 bg-white border border-indigo-100 rounded font-mono text-[10px] break-all select-all">ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
                         <button 
-                          onClick={() => navigator.clipboard.writeText('ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app')}
-                          className="px-2 py-1 bg-rose-200 hover:bg-rose-300 rounded text-[10px] font-bold transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigator.clipboard.writeText('ais-dev-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app');
+                          }}
+                          className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition-colors shrink-0"
                         >
                           Copy
                         </button>
                       </div>
                     </li>
-                    <li>Click <strong>"Add domain"</strong> again and paste this:
-                      <div className="flex items-center gap-2 mt-1">
-                        <code className="flex-1 p-2 bg-rose-100 rounded font-mono text-[10px] break-all">ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
+                    <li>
+                      Click <strong>"Add domain"</strong> again and paste this:
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <code className="flex-1 p-2 bg-white border border-indigo-100 rounded font-mono text-[10px] break-all select-all">ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app</code>
                         <button 
-                          onClick={() => navigator.clipboard.writeText('ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app')}
-                          className="px-2 py-1 bg-rose-200 hover:bg-rose-300 rounded text-[10px] font-bold transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigator.clipboard.writeText('ais-pre-5ufwm5xswynqnbqugyjbmj-280167246665.asia-southeast1.run.app');
+                          }}
+                          className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition-colors shrink-0"
                         >
                           Copy
                         </button>
                       </div>
                     </li>
-                    <li><strong>Important:</strong> Wait 1-2 minutes for Firebase to update, then <strong>refresh this page</strong> (Ctrl+F5) and try again.</li>
+                    <li className="font-medium">
+                      Wait 60 seconds, then <strong>Refresh (Ctrl+F5)</strong> and try again.
+                    </li>
                   </ol>
                 </div>
               )}

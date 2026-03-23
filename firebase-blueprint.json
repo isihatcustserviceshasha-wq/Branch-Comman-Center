@@ -1,10 +1,41 @@
 {
-  "projectId": "gen-lang-client-0853988511",
-  "appId": "1:205359952299:web:6ff4babc1b93adbc7b22ee",
-  "apiKey": "AIzaSyCKGpm8oX4AeEa75V4dZcCvbal7SUz1MTc",
-  "authDomain": "gen-lang-client-0853988511.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-303ed5e7-531b-45f1-b9fa-178fe96d8e58",
-  "storageBucket": "gen-lang-client-0853988511.firebasestorage.app",
-  "messagingSenderId": "205359952299",
-  "measurementId": ""
+  "entities": {
+    "notification": {
+      "title": "Notification",
+      "description": "A WhatsApp message notification from a branch.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "branch": { "type": "string" },
+        "message": { "type": "string" },
+        "time": { "type": "string" },
+        "isNew": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["unread", "new"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["branch", "message", "time", "isNew", "type", "createdAt"]
+    },
+    "branch": {
+      "title": "Branch",
+      "description": "A physical branch location.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "whatsappUrl": { "type": "string" },
+        "unreadCount": { "type": "integer" }
+      },
+      "required": ["name", "whatsappUrl", "unreadCount"]
+    }
+  },
+  "firestore": {
+    "/notifications/{notificationId}": {
+      "schema": "notification",
+      "description": "Collection of all WhatsApp notifications."
+    },
+    "/branches/{branchId}": {
+      "schema": "branch",
+      "description": "Configuration and status for each branch."
+    }
+  }
 }

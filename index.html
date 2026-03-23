@@ -1,55 +1,13 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // ===============================================================
-    // Helper Functions
-    // ===============================================================
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-    
-    function isAdmin() {
-      return isAuthenticated() &&
-        (
-          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-          (request.auth.token.email == "isihatcustserviceshasha@gmail.com" && request.auth.token.email_verified == true)
-        );
-    }
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Google AI Studio App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
 
-    function isValidNotification(data) {
-      return data.branch is string && data.branch.size() < 100 &&
-             data.message is string && data.message.size() < 1000 &&
-             data.type in ['unread', 'new'] &&
-             data.isNew is bool &&
-             data.time is string && data.time.size() < 50 &&
-             data.createdAt is timestamp;
-    }
-
-    function isValidBranch(data) {
-      return data.name is string && data.name.size() < 100 &&
-             data.whatsappUrl is string && data.whatsappUrl.size() < 500 &&
-             data.unreadCount is int && data.unreadCount >= 0;
-    }
-
-    // Notifications: Admins can read/write
-    match /notifications/{notificationId} {
-      allow read: if isAdmin();
-      allow create, update: if isAdmin() && isValidNotification(request.resource.data);
-      allow delete: if isAdmin();
-    }
-
-    // Branches: Admins can read/write
-    match /branches/{branchId} {
-      allow read: if isAdmin();
-      allow create, update: if isAdmin() && isValidBranch(request.resource.data);
-      allow delete: if isAdmin();
-    }
-
-    // Users: Users can read their own data, admins can do anything
-    match /users/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin();
-    }
-  }
-}
