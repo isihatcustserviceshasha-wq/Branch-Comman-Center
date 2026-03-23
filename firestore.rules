@@ -35,14 +35,19 @@ service cloud.firestore {
     // Notifications: Admins can read/write
     match /notifications/{notificationId} {
       allow read: if isAdmin();
-      allow create, update: if isAdmin() && isValidNotification(request.resource.data);
+      allow create: if isAdmin() && isValidNotification(request.resource.data);
+      allow update: if isAdmin() && isValidNotification(request.resource.data) &&
+                      request.resource.data.createdAt == resource.data.createdAt &&
+                      request.resource.data.branch == resource.data.branch;
       allow delete: if isAdmin();
     }
 
     // Branches: Admins can read/write
     match /branches/{branchId} {
       allow read: if isAdmin();
-      allow create, update: if isAdmin() && isValidBranch(request.resource.data);
+      allow create: if isAdmin() && isValidBranch(request.resource.data);
+      allow update: if isAdmin() && isValidBranch(request.resource.data) &&
+                      request.resource.data.name == resource.data.name;
       allow delete: if isAdmin();
     }
 
